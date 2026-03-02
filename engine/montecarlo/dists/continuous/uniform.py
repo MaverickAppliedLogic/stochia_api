@@ -1,7 +1,7 @@
 import numpy as np
 
-def gen_uniform_montecarlo(a: int, b: int, size: int) -> dict:
-    values = np.random.uniform(a, b, size)
+def gen_uniform_montecarlo(low: int, high: int, size: int) -> dict:
+    values = np.random.uniform(low, high, size)
 
     return {
         "values": values.tolist(),

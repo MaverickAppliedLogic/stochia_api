@@ -1,5 +1,4 @@
-
-import distribution.distribution as dist
+import engine.montecarlo.montecarlo_gen as dist
 
 if __name__ == "__main__":
     dist_type = input("Tipo de distribucion: ")
@@ -9,7 +8,7 @@ if __name__ == "__main__":
     count = 0
     while not (param == "stop"):
         count += 1
-        params[f"p{count}"] = int(param)
+        params[f"p{count}"] = float(param)
         param = input("new param: ")
 
-    print(dist.generate_distribution(dist_type,params,10))
+    print(dist.generate_sim_montecarlo(dist_type,params,10000))
