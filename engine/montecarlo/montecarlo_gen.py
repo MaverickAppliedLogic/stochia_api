@@ -1,7 +1,9 @@
 import engine.montecarlo.dists.continuous.exponential as exsim
 import engine.montecarlo.dists.continuous.normal as nsim
 import engine.montecarlo.dists.continuous.uniform as usim
-import engine.montecarlo.dists.continuous.beta as bsim
+import engine.montecarlo.dists.continuous.beta as btsim
+import engine.montecarlo.dists.discrete.bernoulli as besim
+import engine.montecarlo.dists.discrete.binomial as bisim
 
 def generate_sim_montecarlo(dist_type: str, params: dict, size: int) -> dict:
 
@@ -13,7 +15,11 @@ def generate_sim_montecarlo(dist_type: str, params: dict, size: int) -> dict:
         case "exponential":
             return exsim.gen_exponential_montecarlo(params["p1"], size)
         case "beta":
-            return bsim.gen_beta_montecarlo(params["p1"], params["p2"], size)
+            return btsim.gen_beta_montecarlo(params["p1"], params["p2"], size)
+        case "bernoulli":
+            return besim.gen_bernoulli_montecarlo(params["p1"], params["p2"])
+        case "binomial":
+            return bisim.gen_binomial_montecarlo(params["p1"], params["p2"], size)
         case _:
             raise ValueError(f"Unknown distribution type: {dist_type}")
 
