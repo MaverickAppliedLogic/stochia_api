@@ -4,6 +4,7 @@ import engine.montecarlo.dists.continuous.uniform as usim
 import engine.montecarlo.dists.continuous.beta as btsim
 import engine.montecarlo.dists.discrete.bernoulli as besim
 import engine.montecarlo.dists.discrete.binomial as bisim
+import engine.montecarlo.dists.discrete.geometrical as gsim
 
 def generate_sim_montecarlo(dist_type: str, params: dict, size: int) -> dict:
 
@@ -20,6 +21,8 @@ def generate_sim_montecarlo(dist_type: str, params: dict, size: int) -> dict:
             return besim.gen_bernoulli_montecarlo(params["p1"], params["p2"], params["p3"])
         case "binomial":
             return bisim.gen_binomial_montecarlo(params["p1"], params["p2"], size)
+        case "geometrical":
+            return gsim.gen_geometrical_montecarlo(params["p1"])
         case _:
             raise ValueError(f"Unknown distribution type: {dist_type}")
 

@@ -1,7 +1,5 @@
 import numpy as np
 
-# TODO recibir una lista de intentos por simulación.
-#  Que de los resultados de la fiabilidad de 'p' dependiendo el número de intentos
 def gen_bernoulli_montecarlo(p: float, tries: int, simulation: int) -> dict:
 
     results = {"res": []}
