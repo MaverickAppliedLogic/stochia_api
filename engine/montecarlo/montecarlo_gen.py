@@ -17,7 +17,7 @@ def generate_sim_montecarlo(dist_type: str, params: dict, size: int) -> dict:
         case "beta":
             return btsim.gen_beta_montecarlo(params["p1"], params["p2"], size)
         case "bernoulli":
-            return besim.gen_bernoulli_montecarlo(params["p1"], params["p2"])
+            return besim.gen_bernoulli_montecarlo(params["p1"], params["p2"], params["p3"])
         case "binomial":
             return bisim.gen_binomial_montecarlo(params["p1"], params["p2"], size)
         case _:
