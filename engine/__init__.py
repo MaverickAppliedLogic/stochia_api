@@ -1,6 +1,8 @@
+import numpy as np
 import pandas
 
-import engine.montecarlo.montecarlo_gen as dist
+import engine.montecarlo.montecarlo_gen as mc
+import engine.distribution.distribution as dist
 from pandas import DataFrame as df
 
 if __name__ == "__main__":
@@ -14,7 +16,7 @@ if __name__ == "__main__":
         params[f"p{count}"] = float(param)
         param = input("new param: ")
 
-    results = df(dist.generate_sim_montecarlo(dist_type,params,10000))
+    results = df(mc.generate_sim_montecarlo(dist_type, params, 10000))
     pandas.set_option('display.max_colwidth', None)
     pandas.set_option('display.max_rows', None)
     print(results)
