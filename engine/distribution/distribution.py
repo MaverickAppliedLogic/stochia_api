@@ -1,4 +1,4 @@
-def get_distribution(datos: list[int]):
+def get_distribution(datos: list[int]) -> dict:
     # 1. Limpiar datos
     datos = [d for d in datos if d is not None]
 
@@ -18,19 +18,16 @@ def get_distribution(datos: list[int]):
     import numpy as np
     arr = np.array(datos)
 
-    estadisticas = {
-        "media": float(np.mean(arr)),
-        "desviacion": float(np.std(arr)),
-        "p5": float(np.percentile(arr, 5)),
-        "p95": float(np.percentile(arr, 95)),
-        "min": float(np.min(arr)),
-        "max": float(np.max(arr))
-    }
 
     # 5. Resultado final
     return {
         "frecuencias": frecuencias,
         "probabilidades": probabilidades,
-        "estadisticas": estadisticas,
+        "media": float(np.mean(arr)),
+        "desviacion": float(np.std(arr)),
+        "p5": float(np.percentile(arr, 5)),
+        "p95": float(np.percentile(arr, 95)),
+        "min": float(np.min(arr)),
+        "max": float(np.max(arr)),
         "total_datos": total
     }
