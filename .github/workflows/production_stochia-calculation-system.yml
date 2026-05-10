@@ -33,13 +33,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
 
-      - name: Remove unsupported app settings
-        run: |
-          az functionapp config appsettings delete \
-            --name stochia-calculation-system \
-            --resource-group resourcetest \
-            --setting-names WEBSITE_RUN_FROM_PACKAGE SCM_DO_BUILD_DURING_DEPLOYMENT ENABLE_ORYX_BUILD
-
       - name: Install dependencies for Linux x86_64
         run: |
           pip install \
@@ -57,10 +50,9 @@ jobs:
             --exclude "*.pyc" \
             --exclude "__pycache__/*"
 
-      - name: Deploy to Azure Functions (Flex Consumption)
+      - name: Deploy to Azure Functions
         run: |
-          az functionapp deploy \
+          az functionapp deployment source config-zip \
             --name stochia-calculation-system \
             --resource-group resourcetest \
-            --src-path deploy.zip \
-            --type zip
+            --src deploy.zip
