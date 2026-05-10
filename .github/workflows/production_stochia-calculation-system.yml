@@ -29,8 +29,10 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+
       - name: Install dependencies
         run: pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+
 
       # Optional: Add step to run tests here
 
@@ -52,6 +54,7 @@ jobs:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
 
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -69,6 +72,7 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_330BCE3A9727415890D832132C8927DC }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
+
 
       - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
