@@ -4,6 +4,7 @@ def gen_exponential_montecarlo(lam: float, size: int) -> dict:
     values = np.random.exponential(lam, size)
 
     return {
+        "distribution": "exponential",
         "values": values.tolist(),
         "mean": float(np.mean(values)),
         "std": float(np.std(values)),

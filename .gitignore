@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Claude Code
+.claude/
+
+# Azure Functions
+local.settings.json
+.python_packages/
+
+# Distribution
+dist/
+build/
+*.egg-info/

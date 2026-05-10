@@ -1,33 +1,32 @@
-def get_distribution(datos: list[int]) -> dict:
-    # 1. Limpiar datos
-    datos = [d for d in datos if d is not None]
+def get_distribution(data: list[int]) -> dict:
+    # 1. Clean data
+    data = [d for d in data if d is not None]
 
-    total = len(datos)
+    total = len(data)
     if total == 0:
         return None
 
-    # 2. Frecuencias
-    frecuencias = {}
-    for d in datos:
-        frecuencias[d] = frecuencias.get(d, 0) + 1
+    # 2. Frequencies
+    frequencies = {}
+    for d in data:
+        frequencies[d] = frequencies.get(d, 0) + 1
 
-    # 3. Probabilidades
-    probabilidades = {valor: freq / total for valor, freq in frecuencias.items()}
+    # 3. Probabilities
+    probabilities = {value: freq / total for value, freq in frequencies.items()}
 
-    # 4. Estadísticas básicas
+    # 4. Basic statistics
     import numpy as np
-    arr = np.array(datos)
+    arr = np.array(data)
 
-
-    # 5. Resultado final
+    # 5. Final result
     return {
-        "frecuencias": frecuencias,
-        "probabilidades": probabilidades,
-        "media": float(np.mean(arr)),
-        "desviacion": float(np.std(arr)),
+        "frequencies": frequencies,
+        "probabilities": probabilities,
+        "mean": float(np.mean(arr)),
+        "std_dev": float(np.std(arr)),
         "p5": float(np.percentile(arr, 5)),
         "p95": float(np.percentile(arr, 95)),
         "min": float(np.min(arr)),
         "max": float(np.max(arr)),
-        "total_datos": total
+        "total": total
     }
