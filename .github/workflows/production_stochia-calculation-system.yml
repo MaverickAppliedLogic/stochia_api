@@ -21,6 +21,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -28,29 +33,34 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
 
-      - name: Configure app settings for remote build
+      - name: Remove unsupported app settings
         run: |
-          az functionapp config appsettings set \
+          az functionapp config appsettings delete \
             --name stochia-calculation-system \
             --resource-group resourcetest \
-            --settings \
-              WEBSITE_RUN_FROM_PACKAGE=0 \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=true \
-              ENABLE_ORYX_BUILD=true
+            --setting-names WEBSITE_RUN_FROM_PACKAGE SCM_DO_BUILD_DURING_DEPLOYMENT ENABLE_ORYX_BUILD
+
+      - name: Install dependencies for Linux x86_64
+        run: |
+          pip install \
+            --platform manylinux_2_17_x86_64 \
+            --target=".python_packages/lib/site-packages" \
+            --only-binary=:all: \
+            --python-version 3.13 \
+            -r requirements.txt
 
       - name: Create deployment zip
         run: |
           zip -r deploy.zip . \
             --exclude "*.git*" \
             --exclude ".github/*" \
-            --exclude "__pycache__/*" \
-            --exclude "*.pyc"
+            --exclude "*.pyc" \
+            --exclude "__pycache__/*"
 
-      - name: Deploy via Azure CLI
+      - name: Deploy to Azure Functions (Flex Consumption)
         run: |
-          az functionapp deployment source config-zip \
+          az functionapp deploy \
             --name stochia-calculation-system \
             --resource-group resourcetest \
-            --src deploy.zip \
-            --build-remote true \
-            --timeout 300
+            --src-path deploy.zip \
+            --type zip
