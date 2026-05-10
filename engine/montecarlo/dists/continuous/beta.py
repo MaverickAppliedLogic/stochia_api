@@ -4,6 +4,7 @@ def gen_beta_montecarlo(alpha: float, beta: float, size: int) -> dict:
     values = np.random.beta(alpha + 1,beta + 1,size)
 
     return {
+        "distribution": "beta",
         "values": values.tolist(),
         "mean": float(np.mean(values)),
         "std": float(np.std(values)),
