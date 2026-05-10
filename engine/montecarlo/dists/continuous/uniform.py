@@ -4,6 +4,7 @@ def gen_uniform_montecarlo(low: int, high: int, size: int) -> dict:
     values = np.random.uniform(low, high, size)
 
     return {
+        "distribution": "uniform",
         "values": values.tolist(),
         "mean": float(np.mean(values)),
         "std": float(np.std(values)),
