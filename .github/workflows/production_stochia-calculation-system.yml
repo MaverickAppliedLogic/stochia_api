@@ -25,6 +25,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies for Linux x86_64
+        run: |
+          pip install \
+            --platform manylinux_2_17_x86_64 \
+            --target=".python_packages/lib/site-packages" \
+            --only-binary=:all: \
+            --python-version 3.13 \
+            -r requirements.txt
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -38,5 +52,4 @@ jobs:
           app-name: 'stochia-calculation-system'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
+          scm-do-build-during-deployment: false
