@@ -1,2 +1,3 @@
 azure-functions
+opencensus-ext-azure
 numpy
