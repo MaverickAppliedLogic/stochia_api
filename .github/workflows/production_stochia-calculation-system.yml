@@ -2,7 +2,13 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure Functions: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python project to Azure Function App - stochia-calculation-system
+name: Login to Azure
+  uses: azure/login@v2
+  with:
+    client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_330BCE3A9727415890D832132C8927DC }}
+    tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
+    subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
+    auth-type: IDENTITY
 
 on:
   push:
