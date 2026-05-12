@@ -16,10 +16,6 @@ on:
       - production
   workflow_dispatch:
 
-env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
-  PYTHON_VERSION: '3.13'
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -31,6 +27,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -38,20 +39,26 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
 
-      - name: Configure app settings for remote build
+      - name: Install dependencies for Linux x86_64
         run: |
-          az functionapp config appsettings set \
-            --name stochia-calculation-system \
-            --resource-group resourcetest \
-            --settings \
-              WEBSITE_RUN_FROM_PACKAGE=0 \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=true \
-              ENABLE_ORYX_BUILD=true
+          pip install \
+            --platform manylinux_2_17_x86_64 \
+            --target=".python_packages/lib/site-packages" \
+            --only-binary=:all: \
+            --python-version 3.13 \
+            -r requirements.txt
+
+      - name: Create deployment zip
+        run: |
+          zip -r deploy.zip . \
+            --exclude "*.git*" \
+            --exclude ".github/*" \
+            --exclude "*.pyc" \
+            --exclude "__pycache__/*"
 
       - name: Deploy to Azure Functions
-        uses: Azure/functions-action@v1
-        with:
-          app-name: 'stochia-calculation-system'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
+        run: |
+          az functionapp deployment source config-zip \
+            --name stochia-calculation-system \
+            --resource-group resourcetest \
+            --src deploy.zip
