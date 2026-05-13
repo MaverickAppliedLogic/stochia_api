@@ -4,7 +4,6 @@ import os
 import time
 import numpy as np
 import azure.functions as func
-from opencensus.ext.azure import metrics_exporter
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.samplers import AlwaysOnSampler
@@ -17,6 +16,11 @@ from engine.distribution.distribution import get_distribution
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 _CONN_STR = os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
+
+# Conectar el logger de Python directamente a Application Insights
+if _CONN_STR:
+    _ai_handler = AzureLogHandler(connection_string=_CONN_STR)
+    logging.getLogger().addHandler(_ai_handler)
 
 
 def _track_request(name: str, url: str, status: int, duration_ms: float, success: bool):
@@ -81,13 +85,12 @@ def montecarlo(req: func.HttpRequest) -> func.HttpResponse:
         logging.exception("montecarlo error")
         response = _err(str(e), 500)
 
-    _track_request("montecarlo", req.url, response.status_code, (time.time() - start) * 1000, response.status_code < 400)
+    logging.info("REQUEST montecarlo status=%d", response.status_code)
     return response
 
 
 @app.route(route="markov", methods=["POST"])
 def markov(req: func.HttpRequest) -> func.HttpResponse:
-    start = time.time()
     try:
         body = req.get_json()
         result = gen_sim_markov(
@@ -103,13 +106,12 @@ def markov(req: func.HttpRequest) -> func.HttpResponse:
         logging.exception("markov error")
         response = _err(str(e), 500)
 
-    _track_request("markov", req.url, response.status_code, (time.time() - start) * 1000, response.status_code < 400)
+    logging.info("REQUEST markov status=%d", response.status_code)
     return response
 
 
 @app.route(route="distribution", methods=["POST"])
 def distribution(req: func.HttpRequest) -> func.HttpResponse:
-    start = time.time()
     try:
         body = req.get_json()
         result = get_distribution(data=body["data"])
@@ -123,5 +125,5 @@ def distribution(req: func.HttpRequest) -> func.HttpResponse:
         logging.exception("distribution error")
         response = _err(str(e), 500)
 
-    _track_request("distribution", req.url, response.status_code, (time.time() - start) * 1000, response.status_code < 400)
+    logging.info("REQUEST distribution status=%d", response.status_code)
     return response
