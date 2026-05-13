@@ -74,7 +74,7 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F7C666E25E8D4F778D2C4CFE01AEE96A }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6BEA81E86FC349ACB71BD3C7FA728D6E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5AE723846C564A0F99144DE28739ACAF }}
-
+          
       - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
         id: deploy-to-function
@@ -82,4 +82,6 @@ jobs:
           app-name: 'stochia-calculation-system'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          scm-do-build-during-deployment: true
+          enable-oryx-build: true
           
