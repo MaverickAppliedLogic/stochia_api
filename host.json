@@ -3,8 +3,14 @@
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
-        "isEnabled": true
-      }
+        "isEnabled": false
+      },
+      "enableLiveMetrics": true,
+      "enableDependencyTracking": true,
+      "enablePerformanceCountersCollection": true
+    },
+    "logLevel": {
+      "default": "Information"
     }
   },
   "extensionBundle": {
