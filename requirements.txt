@@ -3,4 +3,3 @@ numpy
 pandas
 python-stdnum
 PyYAML
-opencensus-ext-azure
