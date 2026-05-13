@@ -2,13 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure Functions: https://aka.ms/python-webapps-actions
 
-name: Login to Azure
-  uses: azure/login@v2
-  with:
-    client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_330BCE3A9727415890D832132C8927DC }}
-    tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
-    subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
-    auth-type: IDENTITY
+name: Build and deploy Python project to Azure Function App - stochia-calculation-system
 
 on:
   push:
@@ -16,49 +10,76 @@ on:
       - production
   workflow_dispatch:
 
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  PYTHON_VERSION: '3.13' # set this to the python version to use (supports 3.6, 3.7, 3.8)
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python 3.13
+      - name: Setup Python version
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Optional: Add step to run tests here
+
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app
+          path: |
+            release.zip
+            !venv/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: python-app
+
+      - name: Unzip artifact for deployment
+        run: |
+          unzip release.zip
+          rm release.zip
+        
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_330BCE3A9727415890D832132C8927DC }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AF6ADF3D1E784335B321D3FD30B680B9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA12E239229F41AFBCEAFEB8C3EDF0AF }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F7C666E25E8D4F778D2C4CFE01AEE96A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6BEA81E86FC349ACB71BD3C7FA728D6E }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5AE723846C564A0F99144DE28739ACAF }}
 
-      - name: Install dependencies for Linux x86_64
-        run: |
-          pip install \
-            --platform manylinux_2_17_x86_64 \
-            --target=".python_packages/lib/site-packages" \
-            --only-binary=:all: \
-            --python-version 3.13 \
-            -r requirements.txt
-
-      - name: Create deployment zip
-        run: |
-          zip -r deploy.zip . \
-            --exclude "*.git*" \
-            --exclude ".github/*" \
-            --exclude "*.pyc" \
-            --exclude "__pycache__/*"
-
-      - name: Deploy to Azure Functions
-        run: |
-          az functionapp deployment source config-zip \
-            --name stochia-calculation-system \
-            --resource-group resourcetest \
-            --src deploy.zip
+      - name: 'Deploy to Azure Functions'
+        uses: Azure/functions-action@v1
+        id: deploy-to-function
+        with:
+          app-name: 'stochia-calculation-system'
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          
